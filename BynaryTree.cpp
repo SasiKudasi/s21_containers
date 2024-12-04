@@ -17,7 +17,7 @@ public:
     void add(int key, int value){
         if(key < this->key){
             if(this->left == nullptr){
-                this->left = new BynaryTree(key, value);
+                this->left = new BynaryTree(key, value);                
             }else{
                 this->left->add(key, value);
             }
@@ -26,8 +26,7 @@ public:
                 this->right = new BynaryTree(key, value);
             }else{
                 this->right->add(key, value);
-            }
-    
+            }    
         }
     }
 
@@ -50,9 +49,9 @@ public:
     }
 
     void print(BynaryTree *node){
-        if(node != nullptr){
-            std::cout << node->key << " " << node->value << std::endl;
+        if(node != nullptr){            
             print(node->left);
+            std::cout << node->key << " " << node->value << std::endl;
             print(node->right);
         }
     }
@@ -71,6 +70,16 @@ public:
     return GetMin(node->left);
    }
 
+   BynaryTree* GetMax(BynaryTree* node){
+    if (node == nullptr){
+        return nullptr;
+    }
+    if(node->right == nullptr){
+        return node;
+    }
+    return GetMax(node->right);
+   }
+
    BynaryTree* deleteNode(BynaryTree* node, int key){
        if(node == nullptr){
            return nullptr;
@@ -83,10 +92,10 @@ public:
          if(node->left == nullptr || node->right == nullptr){
             node = (node->left == nullptr) ? node->right : node->left;
          }else{
-            BynaryTree* minNode = GetMin(node->right);
-            node->key = minNode->key;
-            node->value = minNode->value;
-            node->right = deleteNode(node->right, minNode->key);
+            BynaryTree* maxInLeft = GetMax(node->left);
+            node->key = maxInLeft->key;
+            node->value = maxInLeft->value;
+            node->left = deleteNode(node->left, maxInLeft->key);
          }
        }
        return node;
@@ -97,15 +106,15 @@ public:
 
 int main(){
     BynaryTree tree(1, 1);
-    tree.add(2, 2);
-    tree.add(3, 3);
+    tree.add(5, 2);
+    tree.add(8, 3);
     tree.add(4, 400);
     tree.add(5, 5);
-    tree.add(6, 6);
+    tree.add(66, 6);
     tree.add(7, 7);
     tree.add(8, 8);
     tree.add(9, 9);
-    tree.deleteNode(&tree,4);
+   // tree.deleteNode(&tree,2);
    
     tree.print(&tree);
     return 0;
