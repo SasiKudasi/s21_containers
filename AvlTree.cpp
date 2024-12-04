@@ -3,19 +3,17 @@ namespace Tree {
 /*
  *& -- ссылка на указатель, через нее можно изменять указатель
  */
-class AvlTree {
+template <typename Key, typename Value = Key> class AvlTree {
 private:
-  int key;
-  int value;
+  Key key;
+  Value value;
   int height = 0;
   AvlTree *left = nullptr;
   AvlTree *right = nullptr;
 
 public:
-  AvlTree(int key, int value) {
-    this->key = key;
-    this->value = value;
-  }
+  AvlTree(Key k, Value v)
+      : key(k), value(v), left(nullptr), right(nullptr), height(0){};
   //~AvlTree();
 
   void updateHeight(AvlTree *tree) {
@@ -69,7 +67,7 @@ public:
     }
   }
 
-  void insert(AvlTree *&tree, int key, int value) {
+  void insert(AvlTree *&tree, Key key, Value value) {
     if (tree == nullptr) {
       tree = new AvlTree(key, value);
       return;
@@ -110,7 +108,7 @@ public:
     return GetMax(node->right);
   }
 
-  AvlTree *deleteNode(AvlTree *node, int key) {
+  AvlTree *deleteNode(AvlTree *node, Key key) {
     if (node == nullptr) {
       return nullptr;
     }
@@ -147,6 +145,24 @@ public:
 
     return node;
   }
+
+  AvlTree *search(Key key) {
+    if (this->key == key) {
+      return this;
+    } else if (key < this->key) {
+      if (this->left == nullptr) {
+        return nullptr;
+      } else {
+        return this->left->search(key);
+      }
+    } else {
+      if (this->right == nullptr) {
+        return nullptr;
+      } else {
+        return this->right->search(key);
+      }
+    }
+  }
   bool isBalanced(AvlTree *node) {
     if (node == nullptr) {
       return true;
@@ -175,21 +191,22 @@ public:
 } // namespace Tree
 
 int main() {
-  Tree::AvlTree *tree = new Tree::AvlTree(5, 2);
-  tree->insert(tree, 10, 200);
-  tree->insert(tree, 20, 200);
-  tree->insert(tree, 5, 50);
-  tree->insert(tree, 15, 150);
-  tree->insert(tree, 25, 250);
+  Tree::AvlTree<int, std::string> *tree =
+      new Tree::AvlTree<int, std::string>(5, "2");
+  tree->insert(tree, 10, "adasd");
+  // tree->insert(tree, 20, 200);
+  // tree->insert(tree, 5, 50);
+  // tree->insert(tree, 15, 150);
+  // tree->insert(tree, 25, 250);
+  // tree->print(tree);
+  // tree->deleteNode(tree, 20);
+  // puts("");
   tree->print(tree);
-  tree->deleteNode(tree, 20);
-  puts("");
-  tree->print(tree);
-  bool balanced = tree->isBalanced(tree);
-  if (balanced) {
-    std::cout << "Дерево сбалансировано" << std::endl;
-  } else {
-    std::cout << "Дерево не сбалансировано" << std::endl;
-  }
+  // bool balanced = tree->isBalanced(tree);
+  // if (balanced) {
+  //   std::cout << "Дерево сбалансировано" << std::endl;
+  // } else {
+  //   std::cout << "Дерево не сбалансировано" << std::endl;
+  // }
   return 0;
 }
