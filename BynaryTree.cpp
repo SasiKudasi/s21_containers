@@ -61,6 +61,38 @@ public:
         std::cout << this->key << " " << this->value << std::endl;
     }
 
+   BynaryTree* GetMin(BynaryTree* node){
+    if (node == nullptr){
+        return nullptr;
+    }
+    if(node->left == nullptr){
+        return node;
+    }
+    return GetMin(node->left);
+   }
+
+   BynaryTree* deleteNode(BynaryTree* node, int key){
+       if(node == nullptr){
+           return nullptr;
+       }
+       if(key < node->key){
+           node->left = deleteNode(node->left, key);
+       }else if(key > node->key){
+           node->right = deleteNode(node->right, key);
+       }else{
+         if(node->left == nullptr || node->right == nullptr){
+            node = (node->left == nullptr) ? node->right : node->left;
+         }else{
+            BynaryTree* minNode = GetMin(node->right);
+            node->key = minNode->key;
+            node->value = minNode->value;
+            node->right = deleteNode(node->right, minNode->key);
+         }
+       }
+       return node;
+
+   }
+
 };
 
 int main(){
@@ -73,8 +105,8 @@ int main(){
     tree.add(7, 7);
     tree.add(8, 8);
     tree.add(9, 9);
-    auto node = tree.search(4);
-    node->print();
-    //tree.print(&tree);
+    tree.deleteNode(&tree,4);
+   
+    tree.print(&tree);
     return 0;
 }
