@@ -1,4 +1,3 @@
-#include "BynaryTree.hpp"
 #include <iostream>
 namespace Tree {
 /*
@@ -91,6 +90,80 @@ public:
     balance(tree);
   }
 
+  AvlTree *GetMin(AvlTree *node) {
+    if (node == nullptr) {
+      return nullptr;
+    }
+    if (node->left == nullptr) {
+      return node;
+    }
+    return GetMin(node->left);
+  }
+
+  AvlTree *GetMax(AvlTree *node) {
+    if (node == nullptr) {
+      return nullptr;
+    }
+    if (node->right == nullptr) {
+      return node;
+    }
+    return GetMax(node->right);
+  }
+
+  AvlTree *deleteNode(AvlTree *node, int key) {
+    if (node == nullptr) {
+      return nullptr;
+    }
+
+    // Шаг 1: Поиск узла, который нужно удалить
+    if (key < node->key) {
+      node->left = deleteNode(node->left, key);
+    } else if (key > node->key) {
+      node->right = deleteNode(node->right, key);
+    } else { // Найден узел для удаления
+      if (node->left == nullptr || node->right == nullptr) {
+        // Один или оба потомка отсутствуют
+        AvlTree *temp = node->left ? node->left : node->right;
+        delete node; // Освобождение памяти для удаляемого узла
+        node = temp; // Перенос ссылки на оставшийся узел
+      } else {
+        // У узла два потомка, находим максимальный элемент в левом поддереве
+        AvlTree *maxInLeft = GetMax(node->left);
+        node->key = maxInLeft->key; // Копируем ключ из максимального элемента в
+                                    // левом поддереве
+        node->value = maxInLeft->value; // Копируем значение
+        node->left = deleteNode(
+            node->left,
+            maxInLeft->key); // Удаляем этот элемент из левого поддерева
+      }
+    }
+    if (node == nullptr) {
+      return nullptr;
+    }
+
+    // Шаг 2: Обновление высоты и балансировка дерева
+    updateHeight(node); // Обновляем высоту текущего узла
+    balance(node); // Балансируем дерево на этом узле
+
+    return node;
+  }
+  bool isBalanced(AvlTree *node) {
+    if (node == nullptr) {
+      return true;
+    }
+    int leftHeight = getHeight(node->left);
+    int rightHeight = getHeight(node->right);
+
+    int balanceFactor = rightHeight - leftHeight;
+
+    // Если баланс-фактор выходит за пределы [-1, 1], дерево несбалансировано
+    if (balanceFactor < -1 || balanceFactor > 1) {
+      return false;
+    }git
+    // Рекурсивно проверяем сбалансированность для левого и правого поддеревьев
+    return isBalanced(node->left) && isBalanced(node->right);
+  }
+
   void print(AvlTree *node) {
     if (node != nullptr) {
       print(node->left);
@@ -107,9 +180,16 @@ int main() {
   tree->insert(tree, 20, 200);
   tree->insert(tree, 5, 50);
   tree->insert(tree, 15, 150);
-  tree->insert(tree, 20, 200);
   tree->insert(tree, 25, 250);
-
   tree->print(tree);
+  tree->deleteNode(tree, 20);
+  puts("");
+  tree->print(tree);
+  bool balanced = tree->isBalanced(tree);
+  if (balanced) {
+    std::cout << "Дерево сбалансировано" << std::endl;
+  } else {
+    std::cout << "Дерево не сбалансировано" << std::endl;
+  }
   return 0;
 }
