@@ -14,7 +14,7 @@ private:
 public:
   AvlTree(Key k, Value v)
       : key(k), value(v), left(nullptr), right(nullptr), height(0){};
-  //~AvlTree();
+  ~AvlTree() { destroyNode(this); }
 
   void updateHeight(AvlTree *tree) {
 
@@ -180,6 +180,14 @@ public:
     return isBalanced(node->left) && isBalanced(node->right);
   }
 
+  void destroyNode(AvlTree *node) {
+    if (node == nullptr) {
+      return;
+    }
+    destroyNode(node->left);
+    destroyNode(node->right);
+    delete node;
+  }
   void print(AvlTree *node) {
     if (node != nullptr) {
       print(node->left);
