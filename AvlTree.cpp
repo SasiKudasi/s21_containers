@@ -159,7 +159,7 @@ public:
     // Если баланс-фактор выходит за пределы [-1, 1], дерево несбалансировано
     if (balanceFactor < -1 || balanceFactor > 1) {
       return false;
-    }git
+    }
     // Рекурсивно проверяем сбалансированность для левого и правого поддеревьев
     return isBalanced(node->left) && isBalanced(node->right);
   }
