@@ -1,7 +1,7 @@
 #ifndef RBTREE_H_
 #define RBTREE_H_
+#include <iostream>
 #include <limits>
-
 namespace s21 {
 template <typename Key, typename T, typename Compare> class RBTree {
 public:
@@ -22,7 +22,34 @@ public:
          const key_type &key, const value_type &value)
         : parent_(parent), left_(left), right_(right), color_(color), key_(key),
           value_(value) {}
-    void swap(Node *other) noexcept;
+    void swap(Node *other) noexcept {
+      if (parent_) {
+        if (parent_->left_ == this) {
+          parent_->left_ = other;
+        } else {
+          parent_->right_ = other;
+        }
+      }
+      if (other->parent_) {
+        if (other->parent_->left_ == other) {
+          other->parent_->left_ = this;
+        } else {
+          other->parent_->right_ = this;
+        }
+      }
+      std::swap(color_, other->color_);
+      std::swap(left_, other->left_);
+      std::swap(right_, other->right_);
+      std::swap(parent_, other->parent_);
+      if (left_)
+        left_->parent_ = this;
+      if (right_)
+        right_->parent_ = this;
+      if (other->left_)
+        other->left_->parent_ = other;
+      if (other->right_)
+        other->right_->parent_ = other;
+    }
 
   public:
     Node *parent_, *left_, *right_;
@@ -38,21 +65,21 @@ public:
   public:
     iterator() : node_(nullptr) {}
     explicit iterator(Node *node) : node_(node) {}
-    reference operator*() const noexcept->reference { return node_->value_; }
-    iterator &operator++() noexcept->iterator & {
+    reference operator*() const noexcept { return node_->value_; }
+    iterator &operator++() noexcept {
       node_ = next_node(node_);
       return *this;
     }
-    iterator &operator--() noexcept->iterator & {
+    iterator &operator--() noexcept {
       node_ = prev_node(node_);
       return *this;
     }
-    iterator operator++(int) noexcept->iterator {
+    iterator operator++(int) noexcept {
       iterator tmp = *this;
       node_ = next_node(node_);
       return tmp;
     }
-    iterator operator--(int) noexcept->iterator {
+    iterator operator--(int) noexcept {
       iterator tmp = *this;
       node_ = prev_node(node_);
       return tmp;
@@ -73,23 +100,21 @@ public:
   public:
     const_iterator() : node_(nullptr) {}
     explicit const_iterator(Node *node) : node_(node) {}
-    const_reference operator*() const noexcept->const_reference {
-      return node_->value_;
-    }
-    const_iterator &operator++() noexcept->const_iterator & {
+    const_reference operator*() const noexcept { return node_->value_; }
+    const_iterator &operator++() noexcept {
       node_ = next_node(node_);
       return *this;
     }
-    const_iterator &operator--() noexcept->const_iterator & {
+    const_iterator &operator--() noexcept {
       node_ = prev_node(node_);
       return *this;
     }
-    const_iterator operator++(int) noexcept->const_iterator {
+    const_iterator operator++(int) noexcept {
       const_iterator tmp = *this;
       node_ = next_node(node_);
       return tmp;
     }
-    const_iterator operator--(int) noexcept->const_iterator {
+    const_iterator operator--(int) noexcept {
       const_iterator tmp = *this;
       node_ = prev_node(node_);
       return tmp;
@@ -170,7 +195,7 @@ public:
       return nullptr;
     return g->left_ == x->parent_ ? g->right_ : g->left_;
   }
-  Node *insert(key_type key, value_type value) noexcept->Node * {
+  Node *insert(key_type key, value_type value) noexcept {
     Node new_node(nullptr, nullptr, nullptr, RED, key, value);
     if (!root_) {
       new_node.color_ = BLACK;
@@ -195,7 +220,7 @@ public:
     return nullptr;
   }
 
-  Node *insert_non_uniq(key_type key, value_type value) noexcept->Node * {
+  Node *insert_non_uniq(key_type key, value_type value) noexcept {
     Node new_node(nullptr, nullptr, nullptr, RED, key, value);
     if (!root_) {
       new_node.color_ = BLACK;
@@ -282,7 +307,7 @@ public:
     if (root_ == g)
       root_ = p;
   }
-  Node *find(key_type key) const noexcept->Node * {
+  Node *find(key_type key) const noexcept {
     for (Node *i = root_; i; i = (comp_(key, i->key_) ? i->left_ : i->right_))
       if (!comp_(key, i->key_) && !comp_(i->key_, key))
         return i;
@@ -327,18 +352,18 @@ public:
     root_->color_ = BLACK;
     update_head();
   }
-  static Node *min(Node *subtree)->Node * {
+  static Node *min(Node *subtree) {
     for (; subtree->left_; subtree = subtree->left_) {
     }
     return subtree;
   }
-  static Node *max(Node *subtree)->Node * {
+  static Node *max(Node *subtree) {
     for (; subtree->right_; subtree = subtree->right_) {
     }
     return subtree;
   }
-  void delete_node(Node *x) noexcept { delete_node(i.node_); }
-  void delete_node(iterator i) noexcept {
+  void delete_node(iterator i) noexcept { delete_node(i.node_); }
+  void delete_node(Node *x) noexcept {
     root_->parent_ = nullptr;
     // red node with 0 children
     if (x->color_ == RED && !x->left_ && !x->right_) {
@@ -487,7 +512,7 @@ public:
       rebalance_left_subtree(x);
     }
   }
-  static Node *next_node(Node *x)->Node * {
+  static Node *next_node(Node *x) {
     if (x->right_) {
       x = min(x->right_);
       return x;
@@ -506,7 +531,7 @@ public:
     x = nextNode;
     return x;
   }
-  static Node *prev_node(Node *x)->Node * {
+  static Node *prev_node(Node *x) {
     if (!x->parent_)
       return x->right_;
     if (x->left_) {
@@ -533,7 +558,7 @@ public:
     }
     other.delete_tree();
   }
-  size_type size() const noexcept->size_type { return node_count_; }
+  size_type size() const noexcept { return node_count_; }
   void swap(RBTree &other) noexcept {
     std::swap(head_, other.head_);
     std::swap(root_, other.root_);
@@ -542,8 +567,8 @@ public:
   size_type max_size() const noexcept {
     return std::numeric_limits<size_type>::max() / sizeof(Node) / 2;
   }
-  iterator begin() const noexcept->iterator { return iterator(min(head_)); }
-  iterator end() const noexcept > iterator { return iterator(head_); }
+  iterator begin() const noexcept { return iterator(min(head_)); }
+  iterator end() const noexcept { return iterator(head_); }
 
 private:
   // data
@@ -553,4 +578,4 @@ private:
   Compare comp_;
 };
 } // namespace s21
-#endif RBTREE_H_
+#endif // RBTREE_H_
